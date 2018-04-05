@@ -1,15 +1,27 @@
-
+"set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab
 "===========default setting
-set cindent
+set ts=4
+set sts=4
+set sw=4
+set smarttab
+set expandtab
+"set cindent
 set smartindent
-set autoindent
+"set autoindent
 set nowrap
 set ff=unix
 set bg=dark
 set ruler
 "specify folders to be searched
-set path=/home/jhlim/nvs3320/application/library/include,/usr/include,/usr/local/include,/usr/src/include,/BSP/kernel/kernel-3.4.39
+set path=/usr/include,/usr/local/include,/usr/src/include,/BSP/kernel/kernel-3.4.39
 set nu
+set fileencodings=euc-kr,utf-8
+"=========== ab, ia
+ab 메일 jhlim@plk.co.kr
+ia 시간0 <C-R>=strftime("%Y.%m.%d-%H:%M:%S")<CR>
+ia ndkfs0 <C-R>=strftime("%Y.%m.%d-%H:%M:%S")<CR>
+ia 시간1 <C-R>=strftime("%c")<CR>
+ia ndkfs1 <C-R>=strftime("%c")<CR>
 
 "===========key mapping
 "folding
@@ -17,10 +29,10 @@ map <F1> v]}zf
 "unfolding
 map <F2> zo
 "Taglist plugin
-map <F3> :Tlist<cr><C-W><C-W>
-map <F7> :NERDTree<cr><C-W><C-W>
+map <F3> :TlistToggle <cr><C-W><C-W>
+map <F4> :TagbarToggle <cr><C-W><C-W>
+map <F7> :NERDTreeToggle <cr><C-W><C-W>
 "Buffer Explorer plugin
-"map <F4> :BufExplorer<cr>
 map <PageUp> <C-U><C-U>
 map <PageDown> <C-D><C-D>
 
@@ -44,7 +56,8 @@ map ,z :bp!<CR>       "previous buffer
 map ,w :bw<CR>        "close current file buffer
 
 "===========ctags setting
-set tags=./tags,./TAGS,tags,TAGS,../tags,../../tags,/usr/include/tags,/usr/local/include/tags,/BSP/kernel/kernel-3.4.39/tags
+set tags=./tags,./TAGS,tags,TAGS,../tags,../../tags,/usr/include/tags,/usr/local/include/tags,
+"========== ,/home/jhlim/git_local/myproject/kernel/kernel-3.4.39/tags,/home/jhlim/git_local/myproject/application/tags,/home/jhlim/stdlib.tags,/home/jhlim/git_local/myproject/prototype/tags
 
 if version >= 500
 func! Sts()
@@ -62,13 +75,17 @@ endif
 
 "===========cscope setting
 set csprg=/usr/bin/cscope
+set csto=0 
+set cst 
 set nocsverb
 "cs add ~/../../BSP/kernel/kernel-3.4.39/cscope.out
-cs add /BSP/kernel/kernel-3.4.39/cscope.out
-cs add ./cscope.out
+"cs add /BSP/kernel/kernel-3.4.39/cscope.out
+if filereadable("./cscope.out")       
+	cs add cscope.out                 
+    else                                  
+	cs add ~/git_local/myproject/kernel/kernel-3.4.3/cscope.out
+endif                                  
 set csverb
-set csto=0
-set cst
 
 func! Css()
     let css = expand("<cword>")
@@ -110,6 +127,16 @@ func! Csg()
 endfunc
 nmap ,csg :call Csg()<cr>
 
+func! Cst()
+    let csg = expand("<cword>")
+    new
+    exe "cs find t ".cst
+    if getline(1) == ""
+        exe "q!"
+    endif
+endfunc
+nmap ,cst :call Cst()<cr>
+
 "===========man page setting
 func! Man()
     let sm = expand("<cword>")
@@ -117,6 +144,15 @@ func! Man()
 endfunc
 nmap ,ma :call Man()<cr><cr>
 
+"================
+let g:tagbar_type_snippets = {
+  \ 'ctagstype' : 'snippets',
+  \ 'kinds' : [
+    \ 's:snippet'
+  \ ]
+  \ }
+"================
+command! Ctags execute '!/usr/bin/ctags -R .'
 
 set nocompatible
 " set the runtime path to include Vundle and initialize
@@ -126,9 +162,11 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 
 Plugin 'gmarik/Vundle.vim'
+Plugin 'Tagbar'
 Plugin 'The-NERD-tree'
 Plugin 'taglist-plus'
-
+Plugin 'jellybean.vim'
+Plugin 'pboettch/vim-cmake-syntax'
 call vundle#end()            " required
 
 filetype plugin indent on    " required
